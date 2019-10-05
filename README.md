@@ -1,103 +1,34 @@
-## Aula 03 - Hook useEffect
+## Aula 04 - Hook useMemo
 
-O `useEffect` soprõe os ciclos de vida anteriores que usavamos com classes: `componentDidMount`, `componentDidUpdate`, `componentWillUnmount`. Nessa aula vamos aprender como aplicar o useEffects para substituir esses três ciclos mencionados.
+Esse hook é indicado para fazer cálculos mais complexos no componente, e são úteis para componentes sensíveis que tem muita renderização. Então componentes que possuem cáclulos e  muitas alterações de estado, vão renderizar sempre que cada estado alterar e o `useMemo` vem para otimizar isso, podemos criar uma propriedade que recebe um valor e é recalculado apenas se um estado específico alterar e estiver no array de dependência no `useMemo`.
 
-### componentDidUpdate
+Exemplo aqui: `<strong>Você tem {tech.length} tecnologias</strong>`
 
-Se a gente quiserse armazenar as variáveis das tecnologias no localStorage sempre que uma variável de estado alterasse, teríavmos que comparar o estado com o que está vindo e ver se eram diferente e atualizar o estado com o novo valor e chamar o localStorage.setItem(...) para armazenar esse array com o novo valor.
+Toda vez que qualquer estado altearr esse tech.length será executado, tá ele é simples e tals, mas se fosse um formatPrice, ou calculaImposto, ai seria custoso, e imagina que alterou um estado qualquer da aplicação que não tem nada haver com algo que haja necesidade de formatar preço ou calcular imposto ser renderizado refazendo todo o calculo.
 
-Agora com useEffects fazemos assim:
+O que podemos fazer é utilizar o useMemo, importando-o:
 
 ```
-import React, { useState, useEffect } from  'react';
+import React, { useState, useEffect, useMemo } from  'react';
 ...
-useEffect(() => {
-    localStorage.setItem('tech', JSON.stringify(tech));
-}, [tech]);
 ```
 
-passamos para a função useEffect uma função que faz o que precisarmos que nesse caso é passar para o localStorage um novo item 'tech' com o array em formato de JSON. E o segundo parametro é um array de dependências, quando eu passo um array com um valor, toda vez que esse estado for alterado então esse useEffect vai ser executado. Nesse caso toda vez que `tech` sofrer uma alteração o useEffect vai ser chamado.
-
-### componentDidMount
-
-Mas se eu quiser que execute apenas uma vez, quando o componente montar em tela? Só não passar o estado no array de dependência:
+Criar uma variável que armazena um valor, e a cada alteração no estado de `tech` então o `useMemo` é executado alterando o valor do `techSize`:
 
 ```
-  useEffect(() => {
-    const storageTech = localStorage.getItem('tech');
-    if (storageTech) {
-      setTech(JSON.parse(storageTech));
-    }
-  }, []);
+const techSize =  useMemo(() => tech.length, [tech]);
 ```
 
-Podemos ter vários useEffects, nesse useEffect estamos fazendo a mesma coisa que a função componendDidMount está fazendo, depois que o componente é montado, verificamos o array de dependência como está vazio, ele executa quando a tela é montada, e ele pega todos os dados do localstorage que tem o 'tech' como chave e se tiver algum valor então passamos ele para o setTech, o qual vai popular o array e exibir em tela. Como ele não monitora nenhuma variável ele vai ser executado apenas uma vez.
-
-
-### componentWillUnmount
-
-Para executar uma função quando o componente é desmontado é necessário retornar uma função de dentro do useEffect, e essa é função é executada assim que o compenente for desmontar ou seja sumir da tela, isso é útil para cancelar e parar todos events listeners como setTimeout ou setInterval que tenha sido declarado e podemos criar essa função de retorno para cada useEffect se for necessário.
+E alterar para otimizar o código:
 
 ```
-useEffect(() => {
-    const storageTech = localStorage.getItem('tech');
-    if (storageTech) {
-      setTech(JSON.parse(storageTech));
-    }
-
-    return () => {
-      document.removeEventListener();
-    };
-  }, []);
+...
+<strong>Você tem {techSize} tecnologias</strong>
+...
 ```
 
-Pronto, com Hooks, conseguimos cobrir os principais ciclos de vida da aplicacação e o código ficou bem mais legível e simples de manter. Mas é bom entender todos os conceitos para não aplicar de forma errada, o bom que o eslint configurado com a regra do `react-hooks/exhaustive-deps` você vai perceber que fica impossível fazer alguma coisa errada.
+Pronto, agora o `techSize` só alterar se o `tech` alterar. Isso é muito bom!
 
-Olha como ficou nosso componente até aqui:
+Portanto, se precisar fazer algum cálculo no `render` então `useMemo`.
 
-```
-import React, { useState, useEffect } from 'react';
-
-function App() {
-  const [tech, setTech] = useState([]);
-  const [newTech, setNewTech] = useState('');
-
-  function handleAdd() {
-    setTech([...tech, newTech]);
-    setNewTech('');
-  }
-
-  useEffect(() => {
-    const storageTech = localStorage.getItem('tech');
-    if (storageTech) {
-      setTech(JSON.parse(storageTech));
-    }
-
-    return () => {
-      document.removeEventListener();
-    };
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('tech', JSON.stringify(tech));
-  }, [tech]);
-
-  return (
-    <>
-      <ul>
-        {tech.map(t => (
-          <li key={t}>{t}</li>
-        ))}
-      </ul>
-      <input value={newTech} onChange={e => setNewTech(e.target.value)} />
-      <button type="button" onClick={handleAdd}>
-        Adicionar
-      </button>
-    </>
-  );
-}
-
-export default App;
-```
-
-Código [https://github.com/tgmarinho/react-hooks/tree/aula-03-hook-useEffect](https://github.com/tgmarinho/react-hooks/tree/aula-03-hook-useEffect)
+Código [https://github.com/tgmarinho/react-hooks/tree/aula-03-hook-useMemo](https://github.com/tgmarinho/react-hooks/tree/aula-03-hook-useMemo)

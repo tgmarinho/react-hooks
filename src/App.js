@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 function App() {
   const [tech, setTech] = useState([]);
@@ -24,6 +24,8 @@ function App() {
     localStorage.setItem('tech', JSON.stringify(tech));
   }, [tech]);
 
+  const techSize = useMemo(() => tech.length, [tech]);
+
   return (
     <>
       <ul>
@@ -31,6 +33,8 @@ function App() {
           <li key={t}>{t}</li>
         ))}
       </ul>
+      <strong>Você tem {techSize} tecnologias</strong>
+      <br />
       <input value={newTech} onChange={e => setNewTech(e.target.value)} />
       <button type="button" onClick={handleAdd}>
         Adicionar
