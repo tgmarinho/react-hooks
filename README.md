@@ -1,68 +1,102 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Aula 02 - Hook useState
 
-## Available Scripts
+Até agora para poder ter estado na aplicação precisariamos de criar um componente com Class, ou seja, uma classe que extendia de React.Component e definir a variável state e informar seus estados. Na versão 16.8 a API Hooks foi criada para poder diminuir a verbosidade no código evitando a necessidade de usar classes para definir componentes com estados e manipulação do ciclo de vida. Diminui também a verbosidade para integrar com Redux e Apollo (GraphQL).
 
-In the project directory, you can run:
+Primeiro Hook que vamos ver é o `useState`.
 
-### `yarn start`
+### useState
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+É o hook que ser usando dentro da função que vai retornar uma variável e uma função que alterar o estado dessa mesma variável.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+O useState retorna o estado e a função que atualiza o estado.
 
-### `yarn test`
+```
+const [tech, setTech] =  useState([]);
+```
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Criamos uma const que recebe de forma desestruturada uma variável de estado e uma função que atualiza essa variábel de estado, o useState recebe como parâmetro o valor inicial do estado, que no nosso caso é um array vazio.
 
-### `yarn build`
+Mas se passarmos alguns valores, podemos listar as tecnologias:
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+import React, { useState } from 'react';
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+function App() {
+  const [tech, setTech] = useState(['ReactJS', 'ReactNative', 'NodeJS']);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  return (
+    <ul>
+      {tech.map(t => (
+        <li>{t}</li>
+      ))}
+    </ul>
+  );
+}
 
-### `yarn eject`
+export default App;
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Olha como fica mais simples e menos verboso.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Agora vamos alterar o estado com a função `setTech`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+import React, { useState } from 'react';
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+function App() {
+  const [tech, setTech] = useState(['ReactJS', 'ReactNative']);
 
-## Learn More
+  function handleAdd() {
+    setTech([...tech, 'Node.JS']);
+  }
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  return (
+    <>
+      <ul>
+        {tech.map(t => (
+          <li key={t}>{t}</li>
+        ))}
+      </ul>
+      <button onClick={handleAdd}>Adicionar</button>
+    </>
+  );
+}
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+export default App;
+```
 
-### Code Splitting
+Quando o usuário clicar no botão Adicionar, a função `handleAdd` será executada, o `setTech` vai ser invocado e o como o estado é imutável, replico o valor do array e adiciono o novo valor.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+A variável tech armazena todos os dados e o setTech altera o seu estado.
 
-### Analyzing the Bundle Size
+Toda vez que a tech é alterada o render é invocado novamente.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+o useState é o hook mais simples, ele pode armazenar todos os tipos do Javascript.
 
-### Making a Progressive Web App
+Podemos ainda criar um outro hook no mesmo componente, podemos criar quanto quisermos.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+Criaremos um novo Hook:
 
-### Advanced Configuration
+```
+const [newTech, setNewTech] =  useState('');
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+Vai armazenar a tecnologia que eu digitar em um input que vou criar:
 
-### Deployment
+```
+<input  value={newTech}  onChange={e  =>  setNewTech(e.target.value)}  />
+```
+O input recebe um value que é o valor que está sendo digitado, o onChange executa uma função que recebe o evento de digitação no input, que passa para a função de atualização do estado do newTech o valor que está sendo digitado.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+Quando o usuário clica em adicionar, chamamos o método `handleAdd()` que vai repassar para o setTech a nova tecnologia e depois limpar o input passando uma string vazia, veja:
 
-### `yarn build` fails to minify
+```
+  function handleAdd() {
+    setTech([...tech, newTech]);
+    setNewTech('');
+  }
+```
+Simples assim! Esse é o hook mais simples e fácil para aprender!
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+Código [https://github.com/tgmarinho/react-hooks/tree/aula-02-hook-useState](https://github.com/tgmarinho/react-hooks/tree/aula-02-hook-useState)
